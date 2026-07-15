@@ -17,8 +17,7 @@ export default defineConfig({
         command: process.env.PLAYWRIGHT_WEBSERVER_COMMAND ?? "pnpm dev",
         env: {
           ...process.env,
-          EXECUTION_QUEUE_ENABLED: "false",
-          OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "test-key",
+          DEV_AUTH_ENABLED: "true",
         },
         url: `${process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100"}/api/health`,
         timeout: 120000,

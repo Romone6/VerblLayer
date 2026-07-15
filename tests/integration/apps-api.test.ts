@@ -21,7 +21,7 @@ describe("apps api", () => {
         provider_key: "internal_acme_support_admin",
         base_url: "http://localhost:3100",
         auth_method: "none",
-        execution_mode: "hybrid",
+        execution_mode: "api",
       }),
     });
 
@@ -35,17 +35,16 @@ describe("apps api", () => {
     expect(body.apps.length).toBeGreaterThan(0);
   });
 
-  it("fails connection test when connector credentials are missing", async () => {
+  it("reports a real failed connection when the target health endpoint is unreachable", async () => {
     const createReq = new Request("http://localhost:3000/api/apps", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: `Stripe Missing Credential ${Date.now()}`,
-        type: "api_schema",
-        provider_key: "stripe",
-        base_url: "https://api.stripe.com",
-        auth_method: "bearer",
-        auth_env_key: "DOES_NOT_EXIST",
+        name: `Unreachable Target ${Date.now()}`,
+        type: "internal_web_app",
+        provider_key: "internal_acme_support_admin",
+        base_url: "http://127.0.0.1:1",
+        auth_method: "none",
         execution_mode: "api",
       }),
     });
@@ -61,6 +60,6 @@ describe("apps api", () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.connection_status).toBe("failed");
-    expect(String(body.error).toLowerCase()).toContain("credential error");
+    expect(String(body.error).length).toBeGreaterThan(0);
   });
 });

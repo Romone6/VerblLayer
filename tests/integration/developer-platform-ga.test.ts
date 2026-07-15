@@ -35,7 +35,7 @@ beforeAll(async () => {
         description: "Issues a refund",
         inputSchemaJson: { ticket_id: "string", amount: "number", reason: "string" },
         outputSchemaJson: { refund_id: "string", status: "string" },
-        executionStrategy: "api_first_browser_fallback",
+        executionStrategy: "review_required",
         riskLevel: "medium",
         approvalRulesJson: { amount_greater_than: 200 },
         successCondition: "ok",
@@ -80,7 +80,7 @@ describe("developer platform ga routes", () => {
     expect(body.paths?.["/api/mcp/audit"]).toBeDefined();
     expect(body.paths?.["/api/audit/events"]).toBeDefined();
     expect(body.paths?.["/api/send-events/{id}"]).toBeDefined();
-    expect(body.paths?.["/api/auto-send/simulate"]).toBeDefined();
+    expect(body.paths?.["/api/agent/commands/{name}/run"]).toBeDefined();
     expect(body.components?.securitySchemes?.bearerAuth?.scheme).toBe("bearer");
   });
 

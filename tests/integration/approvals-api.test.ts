@@ -21,7 +21,7 @@ beforeAll(async () => {
       description: "approval creation test",
       inputSchemaJson: { ticket_id: "string", amount: "number", reason: "string" },
       outputSchemaJson: { refund_id: "string", status: "string", ticket_status: "string" },
-      executionStrategy: "api_first_browser_fallback",
+      executionStrategy: "review_required",
       riskLevel: "medium",
       approvalRulesJson: { amount_greater_than: 200 },
       successCondition: "ok",

@@ -1,6 +1,5 @@
 ﻿import { createHash } from "node:crypto";
 import { prisma } from "@/lib/db";
-import { assertIpAllowed, getEffectiveSecurityPolicy } from "@/lib/security-policy";
 
 export type ApiKeyScope = "commands:read" | "commands:run" | "executions:read" | "audit:read";
 
@@ -48,16 +47,6 @@ export async function requireApiKey(request: Request, requiredScopes: ApiKeyScop
   if (missing.length > 0) {
     throw new Error(`Forbidden: missing scopes (${missing.join(", ")})`);
   }
-
-  const policy = await getEffectiveSecurityPolicy(record.organisationId);
-  if (policy.api_key_ttl_days > 0) {
-    const expiresAt = new Date(record.createdAt.getTime() + policy.api_key_ttl_days * 24 * 60 * 60 * 1000);
-    if (Date.now() > expiresAt.getTime()) {
-      throw new Error("Unauthorized: API key expired by organisation policy");
-    }
-  }
-
-  assertIpAllowed(request, policy.ip_allowlist);
 
   await prisma.apiKey.update({
     where: { id: record.id },

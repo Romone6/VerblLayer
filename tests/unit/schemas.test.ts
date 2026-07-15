@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { acknowledgeQueueJobSchema, createAppSchema, sourceTextSchema } from "@/lib/schemas";
+import { commandStepsSchema, createAppSchema, sourceTextSchema } from "@/lib/schemas";
 
 describe("schema validation", () => {
   it("validates app payload", () => {
@@ -8,7 +8,7 @@ describe("schema validation", () => {
       type: "internal_web_app",
       base_url: "http://localhost:3000",
       auth_method: "none",
-      execution_mode: "hybrid",
+      execution_mode: "api",
     });
 
     expect(parsed.success).toBe(true);
@@ -23,13 +23,12 @@ describe("schema validation", () => {
     expect(parsed.success).toBe(false);
   });
 
-  it("validates queue acknowledgement payload", () => {
-    const parsed = acknowledgeQueueJobSchema.safeParse({
-      queue: "execution",
-      job_id: "job_123",
-      note: "triaged",
-    });
+  it("requires every reviewed API step to have a route", () => {
+    const parsed = commandStepsSchema.safeParse([
+      { step_type: "api", api_route: "/api/internal/acme/refunds", http_method: "POST" },
+    ]);
 
     expect(parsed.success).toBe(true);
+    expect(commandStepsSchema.safeParse([{ step_type: "api" }]).success).toBe(false);
   });
 });

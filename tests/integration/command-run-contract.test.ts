@@ -57,13 +57,14 @@ beforeAll(async () => {
       description: "Contract run command",
       inputSchemaJson: { ticket_id: "string", amount: "number", reason: "string" },
       outputSchemaJson: { refund_id: "string", status: "string", ticket_status: "string" },
-      executionStrategy: "api_first_browser_fallback",
+      executionStrategy: "review_required",
       riskLevel: "medium",
       approvalRulesJson: { amount_greater_than: 200 },
       successCondition: "ok",
       failureConditionsJson: [],
       sourceEvidenceJson: ["contract"],
       status: "published",
+      steps: { create: { stepIndex: 0, stepType: "api", apiRoute: "/api/internal/acme/refunds", httpMethod: "POST" } },
     },
   });
 
@@ -119,6 +120,7 @@ describe("command run contract", () => {
     });
 
     expect(result.status).toBe("succeeded");
+    if (result.status !== "succeeded") throw new Error("Expected successful dry run");
     expect(result.output.dry_run).toBe(true);
   });
 });

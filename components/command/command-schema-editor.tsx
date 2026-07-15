@@ -15,11 +15,13 @@ export function CommandSchemaEditor({
   inputSchema,
   outputSchema,
   approvalRules,
+  steps,
 }: {
   commandId: string;
   inputSchema: unknown;
   outputSchema: unknown;
   approvalRules: unknown;
+  steps: unknown;
 }) {
   const router = useRouter();
   const form = useForm<CommandSchemaEditorInput>({
@@ -27,7 +29,8 @@ export function CommandSchemaEditor({
     defaultValues: {
       input_schema_json: JSON.stringify(inputSchema, null, 2),
       output_schema_json: JSON.stringify(outputSchema, null, 2),
-      approval_rules_json: JSON.stringify(approvalRules ?? { amount_greater_than: 200 }, null, 2),
+      approval_rules_json: JSON.stringify(approvalRules ?? {}, null, 2),
+      steps_json: JSON.stringify(steps ?? [], null, 2),
     },
   });
 
@@ -39,6 +42,7 @@ export function CommandSchemaEditor({
         input_schema_json: JSON.parse(values.input_schema_json),
         output_schema_json: JSON.parse(values.output_schema_json),
         approval_rules_json: JSON.parse(values.approval_rules_json),
+        steps: JSON.parse(values.steps_json),
       }),
     });
     const json = await response.json();
@@ -79,6 +83,7 @@ export function CommandSchemaEditor({
         <Textarea rows={8} {...form.register("input_schema_json")} />
         <Textarea rows={8} {...form.register("output_schema_json")} />
         <Textarea rows={6} {...form.register("approval_rules_json")} />
+        <Textarea rows={8} aria-label="Execution steps JSON" {...form.register("steps_json")} />
         <div className="flex flex-wrap gap-2">
           <Button type="submit">Save schema</Button>
           <Button type="button" variant="secondary" onClick={publish}>Publish</Button>

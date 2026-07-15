@@ -21,14 +21,11 @@ export function buildCommandFromCandidate(candidate: WorkflowCandidate) {
     description: candidate.description,
     inputSchema,
     outputSchema,
-    executionStrategy: "api_first_browser_fallback",
+    executionStrategy: "review_required",
     riskLevel: candidate.riskLevel as RiskLevel,
-    approvalRules:
-      candidate.riskLevel === "high" || requiredInputs.some((value) => value.toLowerCase().includes("amount"))
-        ? { amount_greater_than: 200 }
-        : null,
-    successCondition: "refund record created and ticket updated",
-    failureConditions: ["target app unreachable", "validation failure", "refund API rejected"],
+    approvalRules: null,
+    successCondition: "configured during review",
+    failureConditions: [],
     sourceEvidence,
   };
 }

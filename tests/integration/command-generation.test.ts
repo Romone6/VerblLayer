@@ -25,11 +25,19 @@ beforeAll(async () => {
 });
 
 describe("command generation", () => {
-  it("creates command from candidate", async () => {
+  it("requires candidate review before creating a command", async () => {
     const res = await generateCommand(new Request("http://localhost"), { params: Promise.resolve({ id: candidateId }) });
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(400);
 
-    const body = await res.json();
+    await prisma.workflowCandidate.update({ where: { id: candidateId }, data: { status: "accepted" } });
+
+    const reviewed = await generateCommand(new Request("http://localhost"), { params: Promise.resolve({ id: candidateId }) });
+    expect(reviewed.status).toBe(201);
+
+    const body = await reviewed.json();
     expect(body.command.name).toContain("issue_refund_from_ticket");
+
+    const steps = await prisma.commandStep.findMany({ where: { commandId: body.command.id } });
+    expect(steps).toEqual([]);
   });
 });

@@ -1,9 +1,9 @@
 import { CommandStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getDevContext } from "@/lib/auth";
-import { forbidden, notFound, ok, serverError } from "@/lib/http";
+import { badRequest, forbidden, notFound, ok, serverError } from "@/lib/http";
 import { writeAuditLog } from "@/lib/audit";
-import { transitionCommandStatus } from "@/lib/command-lifecycle";
+import { hasExecutableApiStep, transitionCommandStatus } from "@/lib/command-lifecycle";
 import { requirePermission } from "@/lib/permissions";
 
 export async function POST(_: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -12,8 +12,11 @@ export async function POST(_: Request, { params }: { params: Promise<{ id: strin
     requirePermission(user.role, "commands:publish");
     const { id } = await params;
 
-    const command = await prisma.actionCommand.findFirst({ where: { id, organisationId } });
+    const command = await prisma.actionCommand.findFirst({ where: { id, organisationId }, include: { steps: true } });
     if (!command) return notFound("Command not found");
+    if (!hasExecutableApiStep(command.steps)) {
+      return badRequest("Command needs an explicit API execution step before publishing.");
+    }
 
     const target = command.status === CommandStatus.draft ? CommandStatus.needs_review : command.status;
     if (target !== command.status) {

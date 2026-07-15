@@ -7,7 +7,6 @@ import { PageHeader } from "@/components/shared/page-header";
 import { MetricCard } from "@/components/shared/metric-card";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { ExecutionSummaryChart } from "@/components/execution/execution-summary-chart";
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-AU", {
   dateStyle: "medium",
@@ -55,7 +54,11 @@ export default async function DashboardPage() {
       </div>
       <Card>
         <h3 className="text-xl font-semibold">Execution status today</h3>
-        <ExecutionSummaryChart succeeded={successfulToday} failed={failedToday} waiting={waitingToday} />
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <MetricCard label="Succeeded" value={successfulToday} />
+          <MetricCard label="Failed" value={failedToday} />
+          <MetricCard label="Awaiting approval" value={waitingToday} />
+        </div>
       </Card>
       <Card>
         <div className="mb-3 flex items-center justify-between">

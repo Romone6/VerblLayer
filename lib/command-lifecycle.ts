@@ -2,6 +2,14 @@
 import { prisma } from "@/lib/db";
 import { canTransitionStatus } from "@/lib/command-status";
 
+export function firstApiRoute(steps: Array<{ apiRoute: string | null }>) {
+  return steps.find((step) => typeof step.apiRoute === "string" && step.apiRoute.startsWith("/"))?.apiRoute ?? null;
+}
+
+export function hasExecutableApiStep(steps: Array<{ apiRoute: string | null }>) {
+  return firstApiRoute(steps) !== null;
+}
+
 export async function transitionCommandStatus(commandId: string, to: CommandStatus) {
   const existing = await prisma.actionCommand.findUnique({ where: { id: commandId } });
   if (!existing) throw new Error("Command not found");

@@ -49,7 +49,6 @@ export default async function CommandDetailPage({ params }: { params: Promise<{ 
               <div key={step.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
                 <p className="font-semibold">Step {step.stepIndex + 1} · {step.stepType}</p>
                 <p className="text-[var(--muted-text)]">Route: {step.apiRoute ?? "Unavailable"}</p>
-                <p className="text-[var(--muted-text)]">Selector: {step.selector ?? "Unavailable"}</p>
               </div>
             ))}
           </div>
@@ -60,6 +59,14 @@ export default async function CommandDetailPage({ params }: { params: Promise<{ 
         inputSchema={command.inputSchemaJson}
         outputSchema={command.outputSchemaJson}
         approvalRules={command.approvalRulesJson}
+        steps={command.steps.filter((step) => step.stepType === "api" && step.apiRoute).map((step) => ({
+          step_type: step.stepType,
+          api_route: step.apiRoute,
+          http_method: step.httpMethod,
+          input_mapping_json: step.inputMappingJson,
+          success_condition_json: step.successConditionJson,
+          error_condition_json: step.errorConditionJson,
+        }))}
       />
       <CommandTestConsole commandId={command.id} commandName={command.name} />
       <div className="grid gap-4 md:grid-cols-2">

@@ -8,19 +8,10 @@ export const appFormSchema = z.object({
     "custom_web_app",
     "api_schema",
     "uploaded_workflow_evidence",
-    "stripe",
-    "zendesk",
-    "hubspot",
-    "salesforce",
-    "netsuite",
-    "jira",
   ]),
   base_url: z.url(),
   auth_method: z.string().min(1),
-  execution_mode: z.string().min(1),
-  auth_env_key: z.string().optional(),
-  username_env_key: z.string().optional(),
-  provider_operation: z.enum(["create_refund", "retrieve_refund", "update_ticket", "update_contact"]).optional(),
+  execution_mode: z.literal("api"),
 });
 
 export const discoverySourceSchema = z.object({
@@ -41,8 +32,9 @@ export const commandSchemaEditorSchema = z.object({
   input_schema_json: z.string().min(2),
   output_schema_json: z.string().min(2),
   approval_rules_json: z.string().min(2),
+  steps_json: z.string().min(2),
 }).superRefine((value, ctx) => {
-  for (const key of ["input_schema_json", "output_schema_json", "approval_rules_json"] as const) {
+  for (const key of ["input_schema_json", "output_schema_json", "approval_rules_json", "steps_json"] as const) {
     try {
       JSON.parse(value[key]);
     } catch {

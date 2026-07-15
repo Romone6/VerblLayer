@@ -1,5 +1,5 @@
 import { forbidden, ok, unauthorized, serverError, tooManyRequests } from "@/lib/http";
-import { runCommandThroughQueue } from "@/lib/execution-queue";
+import { runCommandByName } from "@/lib/execution";
 import { requireApiKey } from "@/lib/api-key-auth";
 import { parseCommandRunRequest } from "@/lib/command-run-contract";
 import { corsResponse } from "@/lib/api-security";
@@ -24,7 +24,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ nam
       return parsed.error;
     }
 
-    const result = await runCommandThroughQueue({
+    const result = await runCommandByName({
       organisationId: keyContext.organisationId,
       userId: keyContext.apiKeyId,
       commandName: name,

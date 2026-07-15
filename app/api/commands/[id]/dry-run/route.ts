@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getDevContext } from "@/lib/auth";
 import { badRequest, forbidden, notFound, ok, serverError } from "@/lib/http";
-import { runCommandThroughQueue } from "@/lib/execution-queue";
+import { runCommandByName } from "@/lib/execution";
 import { requirePermission } from "@/lib/permissions";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -18,7 +18,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       return badRequest("agent_name and input are required");
     }
 
-    const result = await runCommandThroughQueue({
+    const result = await runCommandByName({
       organisationId,
       userId,
       commandName: command.name,

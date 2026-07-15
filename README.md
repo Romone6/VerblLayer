@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VerblLayer
 
-## Getting Started
+VerblLayer is an open-source, self-hosted command layer for business software. It turns real workflow evidence into reviewed, agent-callable commands, then executes only against a real controlled target with approvals, audit records, and drift checks.
 
-First, run the development server:
+It does not simulate workflow discovery, execution, dashboard statistics, audit records, or command health.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
+## What the public core includes
+
+- Persisted PostgreSQL workspaces, workflow evidence, candidates, commands, executions, approvals, drift checks, audit logs, and scoped API keys.
+- Provider-backed workflow discovery. A missing provider key is reported as unavailable; a candidate is never fabricated.
+- Explicit API execution steps. Generation creates an unpublishable review draft; an operator must supply a reviewed target route before publishing.
+- A real controlled Acme Support Admin target, with persistent customer, ticket, and refund state.
+- REST, MCP, and OpenAPI surfaces for scoped agent access.
+
+## Intentionally out of scope
+
+Hosted authentication, SSO/SCIM, custom roles, Redis/BullMQ workers, browser/RPA fallback, third-party connector claims, auto-send simulation, compliance exports, cron/JWKS, SLO dashboards, and marketing-only product claims were removed in the open-source pivot.
+
+## Quick start (PowerShell)
+
+```powershell
+pnpm install
+Copy-Item .env.example .env
+pnpm db:up
+pnpm prisma:migrate:deploy
+pnpm prisma:seed
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3100`. `DEV_AUTH_ENABLED=true` is development-only and resolves the persisted seeded operator. It is rejected in production. Put a real external authentication boundary in front of the web console before exposing it.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verify
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```powershell
+pnpm verify
+```
 
-## Learn More
+The complete gate requires Docker/Postgres and a Playwright-capable browser. For the exact operating flow and current limitations, see [docs/runbook.md](docs/runbook.md), [implementation.md](implementation.md), and [docs/CAPABILITIES.md](docs/CAPABILITIES.md).
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[MIT](LICENSE)

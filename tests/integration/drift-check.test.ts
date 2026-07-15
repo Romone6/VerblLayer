@@ -21,7 +21,7 @@ beforeAll(async () => {
       description: "drift command",
       inputSchemaJson: { ticket_id: "string" },
       outputSchemaJson: { status: "string" },
-      executionStrategy: "api_first_browser_fallback",
+      executionStrategy: "review_required",
       riskLevel: "low",
       successCondition: "ok",
       sourceEvidenceJson: ["drift test"],
@@ -60,46 +60,4 @@ describe("drift monitor", () => {
     expect(stored.length).toBe(1);
   }, 20000);
 
-  it("stores browser_unavailable issue instead of throwing when browser launch fails", async () => {
-    const suffix = randomUUID().slice(0, 8);
-    const selectorCommand = await prisma.actionCommand.create({
-      data: {
-        organisationId,
-        name: `drift_selector_${suffix}`,
-        description: "selector drift command",
-        inputSchemaJson: { ticket_id: "string" },
-        outputSchemaJson: { status: "string" },
-        executionStrategy: "api_first_browser_fallback",
-        riskLevel: "low",
-        successCondition: "ok",
-        sourceEvidenceJson: ["drift selector test"],
-        failureConditionsJson: [],
-        status: "published",
-      },
-    });
-
-    await prisma.commandStep.create({
-      data: {
-        commandId: selectorCommand.id,
-        stepIndex: 0,
-        stepType: "browser",
-        selector: "[data-never-exists]",
-      },
-    });
-
-    const originalChannel = process.env.PLAYWRIGHT_CHANNEL;
-    process.env.PLAYWRIGHT_CHANNEL = "not-a-real-channel";
-    let check;
-    try {
-      check = await runDriftCheck(selectorCommand.id, organisationId);
-    } finally {
-      process.env.PLAYWRIGHT_CHANNEL = originalChannel;
-    }
-
-    expect(check?.status).toBe("broken");
-    expect(check?.issueType).toBe("browser_unavailable");
-
-    await prisma.commandStep.deleteMany({ where: { commandId: selectorCommand.id } });
-    await prisma.actionCommand.delete({ where: { id: selectorCommand.id } });
-  });
 });

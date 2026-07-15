@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getDevContext } from "@/lib/auth";
 import { forbidden, notFound, ok, serverError } from "@/lib/http";
-import { runCommandThroughQueue } from "@/lib/execution-queue";
+import { runCommandByName } from "@/lib/execution";
 import { requirePermission } from "@/lib/permissions";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -17,7 +17,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     if (!execution) return notFound("Execution not found");
 
-    const retried = await runCommandThroughQueue({
+    const retried = await runCommandByName({
       organisationId,
       userId,
       commandName: execution.command.name,

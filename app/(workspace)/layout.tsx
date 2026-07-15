@@ -1,5 +1,7 @@
-﻿import { AppSidebar } from "@/components/app-shell/app-sidebar";
+import { AppSidebar } from "@/components/app-shell/app-sidebar";
 import { AppTopbar } from "@/components/app-shell/app-topbar";
+
+export const dynamic = "force-dynamic";
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,4 +16,3 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     </main>
   );
 }
-

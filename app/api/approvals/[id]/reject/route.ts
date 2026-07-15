@@ -5,13 +5,13 @@ import { requirePermission } from "@/lib/permissions";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { userId, user } = await getDevContext();
+    const { organisationId, userId, user } = await getDevContext();
     requirePermission(user.role, "approvals:review");
     const { id } = await params;
     const body = await request.json();
     const reason = typeof body.reason === "string" ? body.reason : "No reason provided";
 
-    await rejectApproval({ approvalId: id, reviewerId: userId, reason });
+    await rejectApproval({ approvalId: id, organisationId, reviewerId: userId, reason });
     return ok({ status: "rejected" });
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("Forbidden")) {

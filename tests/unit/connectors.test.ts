@@ -8,9 +8,9 @@ describe("connector catalog", () => {
     expect(inferProviderKey("api_schema")).toBe("api_schema");
   });
 
-  it("resolves metadata provider key when valid", () => {
+  it("ignores an unsupported metadata provider key", () => {
     const key = resolveProviderKeyFromMetadata("custom_web_app", { provider_key: "stripe" });
-    expect(key).toBe("stripe");
+    expect(key).toBe("custom_web_app");
   });
 
   it("falls back to inferred provider when metadata key is unknown", () => {
@@ -18,9 +18,7 @@ describe("connector catalog", () => {
     expect(key).toBe("custom_web_app");
   });
 
-  it("exposes known connector definitions", () => {
-    const connector = getConnectorByKey("zendesk");
-    expect(connector).toBeTruthy();
-    expect(connector?.status).toBe("in_development");
+  it("does not claim unsupported connector definitions", () => {
+    expect(getConnectorByKey("zendesk")).toBeNull();
   });
 });
