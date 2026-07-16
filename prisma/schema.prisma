@@ -218,6 +218,7 @@ model ActionCommand {
   app App? @relation(fields: [appId], references: [id], onDelete: SetNull)
   candidate WorkflowCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
   steps CommandStep[]
+  versions CommandVersion[]
   executions CommandExecution[]
   approvals Approval[]
   drifts DriftCheck[]
@@ -244,6 +245,19 @@ model CommandStep {
   @@map("command_steps")
 }
 
+model CommandVersion {
+  id String @id @default(cuid())
+  commandId String @map("command_id")
+  version Int
+  snapshotJson Json @map("snapshot_json")
+  publishedBy String? @map("published_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  command ActionCommand @relation(fields: [commandId], references: [id], onDelete: Cascade)
+  @@unique([commandId, version])
+  @@index([commandId])
+  @@map("command_versions")
+}
+
 model CommandExecution {
   id String @id @default(cuid())
   organisationId String @map("organisation_id")
@@ -257,6 +271,7 @@ model CommandExecution {
   executionMode ExecutionMode @default(api) @map("execution_mode")
   approvalStatus ApprovalStatus? @map("approval_status")
   errorMessage String? @map("error_message")
+  isDryRun Boolean @default(false) @map("is_dry_run")
   traceUrl String? @map("trace_url")
   startedAt DateTime? @map("started_at")
   completedAt DateTime? @map("completed_at")

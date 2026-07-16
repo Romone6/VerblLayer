@@ -14,6 +14,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
       where: { id, organisationId },
       include: {
         steps: true,
+        versions: { orderBy: { version: "desc" } },
         executions: { orderBy: { createdAt: "desc" }, take: 10 },
         drifts: { orderBy: { createdAt: "desc" }, take: 10 },
       },

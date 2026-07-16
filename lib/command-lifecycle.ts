@@ -6,8 +6,12 @@ export function firstApiRoute(steps: Array<{ apiRoute: string | null }>) {
   return steps.find((step) => typeof step.apiRoute === "string" && step.apiRoute.startsWith("/"))?.apiRoute ?? null;
 }
 
-export function hasExecutableApiStep(steps: Array<{ apiRoute: string | null }>) {
-  return firstApiRoute(steps) !== null;
+export function hasExecutableApiStep(steps: Array<{ apiRoute: string | null; httpMethod?: string | null }>) {
+  return steps.some((step) => (
+    typeof step.apiRoute === "string"
+    && step.apiRoute.startsWith("/")
+    && ["GET", "POST", "PATCH", "PUT", "DELETE"].includes(step.httpMethod ?? "")
+  ));
 }
 
 export async function transitionCommandStatus(commandId: string, to: CommandStatus) {

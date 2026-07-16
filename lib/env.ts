@@ -4,7 +4,9 @@ const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   APP_BASE_URL: z.string().url().default("http://localhost:3100"),
+  AUTH_MODE: z.enum(["dev", "trusted_proxy"]).default("dev"),
   DEV_AUTH_ENABLED: z.enum(["true", "false"]).default("false").transform((value) => value === "true"),
+  TRUSTED_AUTH_PROXY_SECRET: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default("gpt-4.1-mini"),
   ANTHROPIC_API_KEY: z.string().optional(),
@@ -23,8 +25,18 @@ if (!parsed.success) {
   throw new Error(`Invalid environment configuration: ${parsed.error.message}`);
 }
 
-if (parsed.data.NODE_ENV === "production" && parsed.data.DEV_AUTH_ENABLED && process.env.NEXT_PHASE !== "phase-production-build") {
+const isProductionBuild = process.env.NEXT_PHASE === "phase-production-build";
+
+if (parsed.data.NODE_ENV === "production" && !isProductionBuild && parsed.data.AUTH_MODE !== "trusted_proxy") {
+  throw new Error("AUTH_MODE must be trusted_proxy in production.");
+}
+
+if (parsed.data.NODE_ENV === "production" && parsed.data.DEV_AUTH_ENABLED && !isProductionBuild) {
   throw new Error("DEV_AUTH_ENABLED must be false in production. The public core does not ship hosted authentication.");
+}
+
+if (parsed.data.NODE_ENV === "production" && !isProductionBuild && (parsed.data.TRUSTED_AUTH_PROXY_SECRET?.length ?? 0) < 32) {
+  throw new Error("TRUSTED_AUTH_PROXY_SECRET must be at least 32 characters in production.");
 }
 
 if (parsed.data.NODE_ENV === "production" && parsed.data.INTERNAL_EXECUTION_TOKEN.length < 32) {

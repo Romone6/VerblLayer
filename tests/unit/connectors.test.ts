@@ -18,7 +18,7 @@ describe("connector catalog", () => {
     expect(key).toBe("custom_web_app");
   });
 
-  it("does not claim unsupported connector definitions", () => {
-    expect(getConnectorByKey("zendesk")).toBeNull();
+  it("defines the narrow Zendesk ticket-update connector", () => {
+    expect(getConnectorByKey("zendesk")?.capabilities).toContain("api_execution");
   });
 });

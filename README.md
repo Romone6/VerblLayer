@@ -10,11 +10,12 @@ It does not simulate workflow discovery, execution, dashboard statistics, audit 
 - Provider-backed workflow discovery. A missing provider key is reported as unavailable; a candidate is never fabricated.
 - Explicit API execution steps. Generation creates an unpublishable review draft; an operator must supply a reviewed target route before publishing.
 - A real controlled Acme Support Admin target, with persistent customer, ticket, and refund state.
+- A narrow real Zendesk connector for ticket updates. It stores only environment-variable names, never credentials.
 - REST, MCP, and OpenAPI surfaces for scoped agent access.
 
 ## Intentionally out of scope
 
-Hosted authentication, SSO/SCIM, custom roles, Redis/BullMQ workers, browser/RPA fallback, third-party connector claims, auto-send simulation, compliance exports, cron/JWKS, SLO dashboards, and marketing-only product claims were removed in the open-source pivot.
+Hosted authentication, SSO/SCIM, custom roles, Redis/BullMQ workers, browser/RPA fallback, generic connector frameworks, auto-send simulation, compliance exports, cron/JWKS, SLO dashboards, and marketing-only product claims were removed in the open-source pivot.
 
 ## Quick start (PowerShell)
 
@@ -27,7 +28,7 @@ pnpm prisma:seed
 pnpm dev
 ```
 
-Open `http://localhost:3100`. `DEV_AUTH_ENABLED=true` is development-only and resolves the persisted seeded operator. It is rejected in production. Put a real external authentication boundary in front of the web console before exposing it.
+Open `http://localhost:3100`. `DEV_AUTH_ENABLED=true` is development-only and resolves the persisted seeded operator. Production requires `AUTH_MODE=trusted_proxy`: an upstream identity proxy must strip client-supplied `x-verblayer-*` headers and inject `x-verblayer-auth-secret`, `x-verblayer-org`, and `x-verblayer-email` after authenticating the user. VerblLayer resolves that identity to an existing database user and role; it does not provision users or trust a role header.
 
 ## Verify
 

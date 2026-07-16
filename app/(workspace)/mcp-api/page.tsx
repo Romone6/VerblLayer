@@ -15,7 +15,10 @@ export default async function McpApiPage() {
     prisma.actionCommand.findMany({ where: { organisationId, status: "published" }, orderBy: { createdAt: "desc" } }),
   ]);
 
-  const endpointSnippet = `POST /api/mcp\nAuthorization: Bearer <api_key>\n{\n  "tool": "run_command",\n  "args": {\n    "command_name": "issue_refund_from_ticket",\n    "agent_name": "agent-1",\n    "input": { "ticket_id": "TCK-1001", "amount": 25, "reason": "duplicate billing" }\n  }\n}`;
+  const sampleCommand = commands[0];
+  const endpointSnippet = sampleCommand
+    ? `POST /api/mcp\nAuthorization: Bearer <api_key>\n{\n  "tool": "run_command",\n  "args": {\n    "command_name": ${JSON.stringify(sampleCommand.name)},\n    "agent_name": "agent-1",\n    "input": ${JSON.stringify(sampleCommand.inputSchemaJson, null, 2)}\n  }\n}`
+    : null;
 
   return (
     <>
@@ -26,9 +29,9 @@ export default async function McpApiPage() {
         <Card>
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-lg font-semibold">MCP command contract</h3>
-            <CopyButton value={endpointSnippet} />
+            {endpointSnippet && <CopyButton value={endpointSnippet} />}
           </div>
-          <pre className="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-3 text-xs">{endpointSnippet}</pre>
+          {endpointSnippet ? <pre className="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-3 text-xs">{endpointSnippet}</pre> : <p className="mt-3 text-sm text-[var(--muted-text)]">Publish a command to generate a real request example from its current input schema.</p>}
           <p className="mt-3 text-xs text-[var(--muted-text)]">Required scopes: commands:read, commands:run, executions:read, audit:read.</p>
           <div className="mt-4 flex flex-wrap gap-3 text-xs">
             <Link href="/api/health" className="rounded-full border border-[var(--border-lime)] bg-lime-300/10 px-3 py-1.5 text-lime-200 transition hover:bg-lime-300/20">GET /api/health</Link>

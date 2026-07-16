@@ -17,6 +17,7 @@ export default async function CommandDetailPage({ params }: { params: Promise<{ 
     include: {
       app: true,
       steps: { orderBy: { stepIndex: "asc" } },
+      versions: { orderBy: { version: "desc" } },
       executions: { orderBy: { createdAt: "desc" }, take: 10 },
       drifts: { orderBy: { createdAt: "desc" }, take: 10 },
     },
@@ -82,6 +83,10 @@ export default async function CommandDetailPage({ params }: { params: Promise<{ 
       <Card>
         <h3 className="text-lg font-semibold">Drift health</h3>
         <pre className="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-3 text-xs">{JSON.stringify(command.drifts, null, 2)}</pre>
+      </Card>
+      <Card>
+        <h3 className="text-lg font-semibold">Published versions</h3>
+        {command.versions.length === 0 ? <p className="mt-3 text-sm text-[var(--muted-text)]">No published snapshot yet.</p> : <pre className="mt-3 overflow-x-auto rounded-xl border border-white/10 bg-black/30 p-3 text-xs">{JSON.stringify(command.versions, null, 2)}</pre>}
       </Card>
     </>
   );

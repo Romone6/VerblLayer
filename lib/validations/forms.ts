@@ -5,6 +5,7 @@ export const appFormSchema = z.object({
   type: z.enum(["internal_web_app", "custom_web_app", "api_schema", "uploaded_workflow_evidence"]),
   provider_key: z.enum([
     "internal_acme_support_admin",
+    "zendesk",
     "custom_web_app",
     "api_schema",
     "uploaded_workflow_evidence",
@@ -12,6 +13,10 @@ export const appFormSchema = z.object({
   base_url: z.url(),
   auth_method: z.string().min(1),
   execution_mode: z.literal("api"),
+  metadata_json: z.object({
+    auth_env_key: z.string().optional(),
+    username_env_key: z.string().optional(),
+  }).optional(),
 });
 
 export const discoverySourceSchema = z.object({
@@ -31,10 +36,11 @@ export const discoverySourceSchema = z.object({
 export const commandSchemaEditorSchema = z.object({
   input_schema_json: z.string().min(2),
   output_schema_json: z.string().min(2),
-  approval_rules_json: z.string().min(2),
-  steps_json: z.string().min(2),
+  api_route: z.string().startsWith("/").max(500),
+  http_method: z.enum(["GET", "POST", "PATCH", "PUT", "DELETE"]),
+  approval_threshold: z.string().optional(),
 }).superRefine((value, ctx) => {
-  for (const key of ["input_schema_json", "output_schema_json", "approval_rules_json", "steps_json"] as const) {
+  for (const key of ["input_schema_json", "output_schema_json"] as const) {
     try {
       JSON.parse(value[key]);
     } catch {
@@ -43,6 +49,12 @@ export const commandSchemaEditorSchema = z.object({
         message: "Must be valid JSON",
         path: [key],
       });
+    }
+  }
+  if (value.approval_threshold?.trim()) {
+    const threshold = Number(value.approval_threshold);
+    if (!Number.isFinite(threshold) || threshold < 0) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Must be a non-negative number", path: ["approval_threshold"] });
     }
   }
 });

@@ -1,10 +1,13 @@
-﻿import { z } from "zod";
+import { z } from "zod";
+
+import { isServerEnvironmentVariableName } from "@/lib/connectors/zendesk";
 
 export const createAppSchema = z.object({
   name: z.string().min(1),
   type: z.enum(["internal_web_app", "custom_web_app", "api_schema", "uploaded_workflow_evidence"]),
   provider_key: z.enum([
     "internal_acme_support_admin",
+    "zendesk",
     "custom_web_app",
     "api_schema",
     "uploaded_workflow_evidence",
@@ -13,6 +16,22 @@ export const createAppSchema = z.object({
   auth_method: z.string().min(1),
   execution_mode: z.literal("api").default("api"),
   metadata_json: z.record(z.string(), z.unknown()).optional(),
+}).superRefine((value, context) => {
+  if (value.provider_key !== "zendesk") return;
+
+  const metadata = value.metadata_json ?? {};
+  const authEnvironmentKey = metadata.auth_env_key;
+  const usernameEnvironmentKey = metadata.username_env_key;
+
+  if (value.type !== "custom_web_app") {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["type"], message: "Zendesk must use the custom_web_app app type." });
+  }
+  if (typeof authEnvironmentKey !== "string" || !isServerEnvironmentVariableName(authEnvironmentKey)) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["metadata_json", "auth_env_key"], message: "Zendesk auth_env_key must be a server-only environment variable name." });
+  }
+  if (typeof usernameEnvironmentKey !== "string" || !isServerEnvironmentVariableName(usernameEnvironmentKey)) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["metadata_json", "username_env_key"], message: "Zendesk username_env_key must be a server-only environment variable name." });
+  }
 });
 
 export const sourceTextSchema = z.object({
