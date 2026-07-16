@@ -15,6 +15,7 @@ Last updated: 2026-07-16
 | Command versions and failure guard | Complete in code, pending migration application | Added append-only publish snapshots and an automatic pause after three consecutive real failures. Dry runs are persisted separately and never count toward the guard. |
 | Guided operator UX and agent handoff | Complete in code | The command editor now uses route/method/threshold controls while retaining JSON only for arbitrary schemas. MCP shows an example from an actual published command or explicitly shows that none exists. |
 | Test and release gate | Partially verified | Unit tests, lint, TypeScript, Prisma client generation, and production build pass. Docker Desktop is stopped, so migration deployment, database integrations, live connector proof, the full `verify` gate, and Playwright remain unavailable. |
+| Open-source publication readiness | Locally complete, externally blocked | Replaced the stale Redis/Phase 4 workflow with a Postgres-only `verify:ci` gate, added community/release files, Dependabot, and a contributor-first README. Public GitHub repository creation, remote CI proof, branch protection, and private security contact configuration require repository-owner action. |
 
 ## Current core flow
 
@@ -43,3 +44,7 @@ Last updated: 2026-07-16
 - 2026-07-16: focused auth/Zendesk/connector suites passed: 3 files, 17 tests.
 - 2026-07-16: full unit suite passed: 14 files, 42 tests. `npm.cmd run lint`, `npx.cmd tsc --noEmit`, `pnpm prisma:generate`, and `npm.cmd run build` passed.
 - 2026-07-16: `docker desktop status` reported `Status=stopped`; `pnpm prisma:migrate:deploy` reached the configured local database then failed with Prisma schema-engine error. No migration deployment, database integration, live Zendesk credential test, full `verify`, or Playwright result is claimed.
+- 2026-07-16: publication-readiness static CI test passed; it prevents the legacy Redis/`verify:phase4:ci` workflow from returning and requires a Postgres-only `verify:ci` command plus Dependabot configuration.
+- 2026-07-16: full unit suite passed: 15 files, 44 tests. `npm.cmd run lint`, `npx.cmd tsc --noEmit`, `pnpm prisma:generate`, and `npm.cmd run build` passed after publication-document changes.
+- 2026-07-16: `pnpm audit --prod` returned HTTP 410 from pnpm's retired audit endpoint and `npm.cmd audit --omit=dev` returned `ENOLOCK` because this pnpm workspace has no npm lockfile. Neither is treated as a vulnerability result; weekly GitHub Dependabot monitoring is configured for the future public remote.
+- 2026-07-16: Docker Desktop still reports `Status=stopped`, so `pnpm verify`, migration deployment, integration tests, Playwright, and live Zendesk sandbox proof remain unverified. No Git remote is configured, so public CI, branch protection, and private security contact are not yet configured.

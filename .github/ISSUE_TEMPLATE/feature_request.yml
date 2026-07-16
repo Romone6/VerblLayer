@@ -1,0 +1,26 @@
+name: Feature proposal
+description: Propose a narrow capability that fits the public command-layer core.
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Real workflow and target software
+      description: Explain the business workflow and the real API or browser contract available.
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety and approval impact
+      description: Describe validation, risk, approval, audit, error, and drift requirements.
+    validations:
+      required: true
+  - type: textarea
+    id: fit
+    attributes:
+      label: Public-core fit
+      description: Explain why this is a narrow, real command-layer capability rather than a generic connector, chatbot, or mock.
+    validations:
+      required: true

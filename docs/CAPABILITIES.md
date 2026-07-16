@@ -4,17 +4,17 @@
 
 | Capability | Status | Evidence boundary |
 | --- | --- | --- |
-| Workflow evidence persistence | Available | Stored in PostgreSQL. |
+| Workflow evidence persistence | Implemented | Stored in PostgreSQL; fresh Docker-backed release proof remains pending. |
 | LLM workflow discovery | Available when configured | Calls the selected provider; missing keys return a real configuration error. |
-| Command generation | Available | Produces a review draft only; no execution path is inferred. |
-| API command execution | Available for controlled Acme and Zendesk ticket updates | Uses the command's persisted app, reviewed method, and route template; unsupported providers return a real error. |
-| Zendesk connection test | Available when configured | Calls Zendesk's live `/api/v2/users/me.json`; only server environment-variable names are persisted. |
-| Dry run | Available | Validates command input and logs a dry-run execution without target side effects. |
-| Threshold approvals | Available | Persists pending/approved/rejected approval records. |
-| Drift checks | Available | Checks the persisted target app's configured API route reachability and persists the result. |
-| Command versions | Available | Every publish creates an immutable persisted snapshot of the command contract and reviewed steps. |
-| Repeated failure safety pause | Available | Three consecutive non-dry-run failures pause a published command and create an audit event. |
-| REST/MCP/OpenAPI | Available | Scoped API-key access with persisted audit events. |
+| Command generation | Implemented | Produces a review draft only; no execution path is inferred. |
+| Acme API command execution | Implemented | Uses the command's persisted app, reviewed method, and route template; full release-gate proof remains pending. |
+| Zendesk ticket update | Implemented, live proof pending | Calls Zendesk's real ticket API and stores only server environment-variable names; sandbox credential proof has not been run. |
+| Dry run | Implemented | Validates command input and logs a dry-run execution without target side effects. |
+| Threshold approvals | Implemented | Persists pending/approved/rejected approval records. |
+| Drift checks | Implemented | Checks the persisted target app's configured API route reachability and persists the result. |
+| Command versions | Implemented | Every publish creates an immutable persisted snapshot of the command contract and reviewed steps. |
+| Repeated failure safety pause | Implemented | Three consecutive non-dry-run failures pause a published command and create an audit event. |
+| REST/MCP/OpenAPI | Implemented | Scoped API-key access with persisted audit events. |
 
 ## Strengths
 

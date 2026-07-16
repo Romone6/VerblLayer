@@ -56,3 +56,19 @@ pnpm verify
 ```
 
 Use `pnpm prisma:migrate:deploy`, never `prisma migrate dev`, for a shared database. The `20260715000000_open_source_core` migration intentionally drops enterprise-only tables; take a backup before applying it to any retained database. The additive `20260716000000_customer_value_core` migration adds command versions and dry-run marking.
+
+## Release preflight
+
+Before cutting a public release, use a fresh Postgres database and run:
+
+```powershell
+pnpm install --frozen-lockfile
+pnpm prisma:migrate:deploy
+pnpm prisma:seed
+pnpm lint
+pnpm test
+pnpm build
+pnpm playwright:test
+```
+
+Then review GitHub Dependabot alerts after the public remote is configured. `pnpm audit` is not included because the installed pnpm audit endpoint currently returns HTTP 410; do not treat that tooling error as an audit result. Prove the controlled Acme lifecycle and, if Zendesk is advertised as verified, test a real Zendesk sandbox with production-like trusted-proxy headers. Record exact results in `implementation.md`. A public release also requires remote CI, protected default-branch rules, and a configured private security contact.
