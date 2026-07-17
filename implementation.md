@@ -1,6 +1,6 @@
 # VerblLayer implementation tracker
 
-Last updated: 2026-07-16
+Last updated: 2026-07-17
 
 ## Open-source core and customer-value delivery
 
@@ -14,8 +14,8 @@ Last updated: 2026-07-16
 | Correct execution and drift routing | Complete in code | Execution uses the persisted target app base URL, reviewed HTTP method, and encoded route parameters. Acme and Zendesk are the only real execution providers. Drift checks use the persisted target, not the console base URL. |
 | Command versions and failure guard | Complete in code, pending migration application | Added append-only publish snapshots and an automatic pause after three consecutive real failures. Dry runs are persisted separately and never count toward the guard. |
 | Guided operator UX and agent handoff | Complete in code | The command editor now uses route/method/threshold controls while retaining JSON only for arbitrary schemas. MCP shows an example from an actual published command or explicitly shows that none exists. |
-| Test and release gate | Partially verified | Unit tests, lint, TypeScript, Prisma client generation, and production build pass. Docker Desktop is stopped, so migration deployment, database integrations, live connector proof, the full `verify` gate, and Playwright remain unavailable. |
-| Open-source publication readiness | Locally complete, externally blocked | Replaced the stale Redis/Phase 4 workflow with a Postgres-only `verify:ci` gate, added community/release files, Dependabot, and a contributor-first README. Public GitHub repository creation, remote CI proof, branch protection, and private security contact configuration require repository-owner action. |
+| Test and release gate | Partially verified | Unit tests, lint, TypeScript, Prisma client generation, and production build pass. The initial remote CI run exposed a missing Prisma generation step, which is now included before migrations. Docker's local engine is still unavailable, so migration deployment, database integrations, live connector proof, the full `verify` gate, and Playwright remain unavailable locally. |
+| Open-source publication readiness | In progress | Public repository `Romone6/VerblLayer` is configured with Issues, Discussions, private vulnerability reporting, secret scanning, push protection, and Dependabot. The corrected remote CI run and `main` branch protection are pending. |
 
 ## Current core flow
 
@@ -34,7 +34,7 @@ Last updated: 2026-07-16
 - Drift validates route reachability, not semantic response contracts.
 - Discovery requires an OpenAI, Anthropic, or OpenRouter API key. Missing configuration is an unavailable capability, not a fallback result.
 - The in-process limiter is suitable for one instance only; use a gateway for distributed deployments.
-- The destructive pivot migration and new additive migration have not been applied or integration-verified because Docker virtualization is unavailable on this machine.
+- The destructive pivot migration and new additive migration have not been applied or integration-verified locally because Docker Desktop cannot start its Linux engine: WSL2 reports that the Virtual Machine Platform feature and BIOS virtualization must be enabled.
 
 ## Verification record
 
@@ -49,3 +49,6 @@ Last updated: 2026-07-16
 - 2026-07-16: `pnpm audit --prod` returned HTTP 410 from pnpm's retired audit endpoint and `npm.cmd audit --omit=dev` returned `ENOLOCK` because this pnpm workspace has no npm lockfile. Neither is treated as a vulnerability result; weekly GitHub Dependabot monitoring is configured for the future public remote.
 - 2026-07-16: Docker Desktop still reports `Status=stopped`, so `pnpm verify`, migration deployment, integration tests, Playwright, and live Zendesk sandbox proof remain unverified.
 - 2026-07-17: public repository `Romone6/VerblLayer` created. Issues, Discussions, GitHub private vulnerability reporting, secret scanning, push protection, topics, and the `main` default branch are configured; remote CI and branch-protection proof remain in progress.
+- 2026-07-17: corrected `verify` and `verify:ci` to generate the Prisma client before migrations after the initial remote CI run failed to load `.prisma/client/default` on a clean checkout. `pnpm prisma:generate`, 44 unit tests, lint, TypeScript, and the production build passed locally after the correction.
+- 2026-07-17: patched public dependencies to Next `16.2.6`, Prisma `6.19.3`, Vitest `4.1.10`, and Vite `8.0.16`; GitHub Dependabot will be rechecked after the corrected commit reaches `main`.
+- 2026-07-17: Docker Desktop was launched twice but its backend did not make an engine available (`//./pipe/dockerDesktopLinuxEngine` is missing). `wsl.exe --status` identifies the cause: the Virtual Machine Platform feature and BIOS virtualization must be enabled. A fresh-database `pnpm verify` run and live Zendesk sandbox test are therefore not claimed. Zendesk retains its pending-live-verification wording.
