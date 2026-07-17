@@ -9,10 +9,10 @@ describe("connectors api", () => {
     const body = await res.json();
     expect(Array.isArray(body.connectors)).toBe(true);
 
-    const stripe = body.connectors.find((item: { providerKey: string }) => item.providerKey === "stripe");
-    expect(stripe).toBeTruthy();
-    expect(stripe.status).toBe("in_development");
-    expect(stripe.usage).toBeTruthy();
-    expect(typeof stripe.usage.total).toBe("number");
+    const zendesk = body.connectors.find((item: { providerKey: string }) => item.providerKey === "zendesk");
+    expect(zendesk).toBeTruthy();
+    expect(zendesk.status).toBe("available");
+    expect(zendesk.capabilities).toContain("api_execution");
+    expect(typeof zendesk.usage.total).toBe("number");
   });
 });

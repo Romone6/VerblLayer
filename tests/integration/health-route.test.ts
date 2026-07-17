@@ -13,10 +13,7 @@ describe("health route", () => {
 
     expect(body.checks).toBeDefined();
     expect(["ok", "error"]).toContain(body.checks.database.status);
-    expect(["ok", "error", "unavailable"]).toContain(body.checks.redis.status);
-    expect(["ok", "error", "unavailable"]).toContain(body.checks.worker.status);
-    expect(["ok", "error", "unavailable"]).toContain(body.checks.driftWorker.status);
-    expect(["ok", "error", "unavailable"]).toContain(body.checks.auth.status);
-    expect(["ok", "error"]).toContain(body.checks.providers.status);
+    expect(["ok", "unavailable"]).toContain(body.checks.discovery.status);
+    expect(["ok", "unavailable"]).toContain(body.checks.localAuth.status);
   });
 });

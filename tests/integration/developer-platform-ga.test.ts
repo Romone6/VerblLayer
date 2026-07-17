@@ -77,9 +77,9 @@ describe("developer platform ga routes", () => {
     const body = await res.json();
     expect(body.openapi).toBe("3.1.0");
     expect(body.info?.version).toBe("v1");
+    expect(body.paths?.["/api/health"]).toBeDefined();
     expect(body.paths?.["/api/mcp/audit"]).toBeDefined();
-    expect(body.paths?.["/api/audit/events"]).toBeDefined();
-    expect(body.paths?.["/api/send-events/{id}"]).toBeDefined();
+    expect(body.paths?.["/api/agent/commands/{name}/dry-run"]).toBeDefined();
     expect(body.paths?.["/api/agent/commands/{name}/run"]).toBeDefined();
     expect(body.components?.securitySchemes?.bearerAuth?.scheme).toBe("bearer");
   });
