@@ -12,3 +12,5 @@ services:
       - callable_pg_data:/var/lib/postgresql/data
 volumes:
   callable_pg_data:
+    # ponytail: retain the pre-rebrand Docker volume so existing local records stay mounted; migrate only when storage separation is explicitly needed.
+    name: verblayer_pg_data
