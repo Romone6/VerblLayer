@@ -29,38 +29,43 @@ test("refund workflow and agent endpoint execution", async ({ page, request }) =
     },
   });
 
-  let command = await prisma.actionCommand.findFirst({
-    where: { organisationId: user.organisationId, name: "issue_refund_from_ticket", status: "published" },
+  const app = await prisma.app.create({
+    data: {
+      organisationId: user.organisationId,
+      name: `E2E Acme Target ${suffix}`,
+      type: "internal_web_app",
+      baseUrl: "http://localhost:3100",
+      authMethod: "none",
+      executionMode: "api",
+      connectionStatus: "connected",
+    },
   });
-
-  if (!command) {
-    command = await prisma.actionCommand.create({
-      data: {
-        organisationId: user.organisationId,
-        name: "issue_refund_from_ticket",
-        description: "Issues a refund",
-        inputSchemaJson: { ticket_id: "string", amount: "number", reason: "string" },
-        outputSchemaJson: { refund_id: "string", status: "string", ticket_status: "string" },
-        executionStrategy: "review_required",
-        riskLevel: "medium",
-        approvalRulesJson: { amount_greater_than: 200 },
-        successCondition: "ok",
-        failureConditionsJson: [],
-        sourceEvidenceJson: ["e2e"],
-        status: "published",
-      },
-    });
-
-    await prisma.commandStep.create({
-      data: {
-        commandId: command.id,
-        stepIndex: 0,
-        stepType: "api",
-        apiRoute: "/api/internal/acme/refunds",
-        httpMethod: "POST",
-      },
-    });
-  }
+  const command = await prisma.actionCommand.create({
+    data: {
+      organisationId: user.organisationId,
+      appId: app.id,
+      name: `issue_refund_from_ticket_${suffix}`,
+      description: "Issues a refund",
+      inputSchemaJson: { ticket_id: "string", amount: "number", reason: "string" },
+      outputSchemaJson: { refund_id: "string", status: "string", ticket_status: "string" },
+      executionStrategy: "review_required",
+      riskLevel: "medium",
+      approvalRulesJson: { amount_greater_than: 200 },
+      successCondition: "ok",
+      failureConditionsJson: [],
+      sourceEvidenceJson: ["e2e"],
+      status: "published",
+    },
+  });
+  await prisma.commandStep.create({
+    data: {
+      commandId: command.id,
+      stepIndex: 0,
+      stepType: "api",
+      apiRoute: "/api/internal/acme/refunds",
+      httpMethod: "POST",
+    },
+  });
 
   await page.goto(`/acme/tickets/${ticket.ticketCode}`);
   await page.fill('[data-testid="refund-amount"]', "22");
